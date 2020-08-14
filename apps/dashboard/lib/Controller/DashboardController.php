@@ -104,6 +104,7 @@ class DashboardController extends Controller {
 		$this->inititalStateService->provideInitialState('dashboard', 'panels', $widgets);
 		$this->inititalStateService->provideInitialState('dashboard', 'layout', $userLayout);
 		$this->inititalStateService->provideInitialState('dashboard', 'firstRun', $this->config->getUserValue($this->userId, 'dashboard', 'firstRun', '1') === '1');
+		$this->inititalStateService->provideInitialState('dashboard', 'shippedBackgrounds', BackgroundService::SHIPPED_BACKGROUNDS);
 		$this->config->setUserValue($this->userId, 'dashboard', 'firstRun', '0');
 
 		return new TemplateResponse('dashboard', 'index');

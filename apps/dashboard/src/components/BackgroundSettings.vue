@@ -22,10 +22,11 @@
 
 <template>
 	<div class="background-selector">
-		<div class="background current" :class="{ loading: loading }">
-			<img :src="backgroundImage">
-		</div>
-		<div v-for="background in shippedBackgrounds" class="background" @click="setUrl(background)" :key="background">
+		<div v-if="loading">Loading</div>
+		<div v-for="background in shippedBackgrounds"
+			:key="background"
+			class="background"
+			@click="setUrl(background)">
 			<img :src="background">
 		</div>
 		<div class="background" @click="pickFile">
@@ -39,36 +40,51 @@
 <script>
 import axios from '@nextcloud/axios'
 import { generateUrl, generateFilePath } from '@nextcloud/router'
+import { loadState } from '@nextcloud/initial-state'
+
 const prefixWithBaseUrl = (url) => generateFilePath('dashboard', '', 'img/') + url
+const shippedBackgroundList = loadState('dashboard', 'shippedBackgrounds')
 
 export default {
 	name: 'BackgroundSettings',
 	data() {
 		return {
 			backgroundImage: generateUrl('/apps/dashboard/background') + '?v=' + Date.now(),
-			shippedBackgrounds: [
-				prefixWithBaseUrl('flickr-paszczak000-8715851521.jpg?v=1'),
-				prefixWithBaseUrl('flickr-148302424@N05-36591009215.jpg?v=1'),
-			],
+			loading: false,
 		}
 	},
+	computed: {
+		shippedBackgrounds() {
+			return shippedBackgroundList.map((item) => {
+				return prefixWithBaseUrl(item)
+			})
+		},
+	},
 	methods: {
-		update() {
-			this.backgroundImage = generateUrl('/apps/dashboard/background') + '?v=' + Date.now()
-			this.$emit('updateBackground')
+		async update() {
+			const date = Date.now()
+			this.backgroundImage = generateUrl('/apps/dashboard/background') + '?v=' + date
+			const image = new Image()
+			image.onload = () => {
+				this.$emit('updateBackground', date)
+				this.loading = false
+			}
+			image.src = this.backgroundImage
 		},
 		setDefault() {
 			console.debug('SetDefault')
 			this.update()
 		},
-		setUrl(url) {
+		async setUrl(url) {
+			this.loading = true
 			console.debug('SetUrl ' + url)
-			axios.post(generateUrl('/apps/dashboard/background'), { url })
+			await axios.post(generateUrl('/apps/dashboard/background'), { url })
 			this.update()
 		},
-		setFile(path) {
+		async setFile(path) {
+			this.loading = true
 			console.debug('SetFile ' + path)
-			axios.post(generateUrl('/apps/dashboard/background'), { path })
+			await axios.post(generateUrl('/apps/dashboard/background'), { path })
 			this.update()
 		},
 		pickFile() {

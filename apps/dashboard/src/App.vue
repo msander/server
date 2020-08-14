@@ -254,8 +254,8 @@ export default {
 				this.firstRun = false
 			}, 1000)
 		},
-		updateBackground() {
-			this.backgroundTime = Date.now()
+		updateBackground(date) {
+			this.backgroundTime = date
 		},
 	},
 }
