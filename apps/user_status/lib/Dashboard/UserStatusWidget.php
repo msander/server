@@ -94,7 +94,7 @@ class UserStatusWidget implements IWidget {
 	 * @inheritDoc
 	 */
 	public function getIconClass(): string {
-		return 'icon-user-status-away';
+		return 'icon-user-status';
 	}
 
 	/**

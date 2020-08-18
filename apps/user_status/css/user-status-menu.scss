@@ -20,6 +20,10 @@
  *
  */
 
+.icon-user-status {
+	@include icon-color('app', 'user_status', $color-black, 1);
+}
+
 .icon-user-status-away {
 	@include icon-color('user-status-away', 'user_status', '#F4A331', 1);
 }

@@ -30,7 +30,7 @@
 			</DashboardWidgetItem>
 		</template>
 		<template v-slot:empty-content>
-			<EmptyContent icon="icon-user-status-away">
+			<EmptyContent icon="icon-user-status">
 				{{ t('user_status', 'No one recently updated their status.') }}
 			</EmptyContent>
 		</template>
