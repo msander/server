@@ -41,6 +41,7 @@
 import { DashboardWidget, DashboardWidgetItem } from '@nextcloud/vue-dashboard'
 import EmptyContent from '@nextcloud/vue/dist/Components/EmptyContent'
 import { loadState } from '@nextcloud/initial-state'
+import moment from '@nextcloud/moment'
 
 export default {
 	name: 'Dashboard',
@@ -57,11 +58,27 @@ export default {
 	},
 	computed: {
 		getWidgetItem() {
-			return (item) => ({
-				mainText: item.displayName,
-				subText: `${item.icon || ''} ${item.message || ''}`,
-				avatarUsername: item.userId,
-			})
+			return (item) => {
+				const icon = item.icon || ''
+				const message = item.message || ''
+				const status = `${icon} ${message}`
+
+				let subText
+				if (item.timestamp !== null) {
+					subText = this.t('user_status', '{status}, {timestamp}', {
+						status,
+						timestamp: moment(item.timestamp, 'X').fromNow()
+					})
+				} else {
+					subText = status
+				}
+
+				return {
+					mainText: item.displayName,
+					subText,
+					avatarUsername: item.userId,
+				}
+			}
 		},
 	},
 	mounted() {
