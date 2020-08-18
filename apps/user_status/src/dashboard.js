@@ -19,42 +19,30 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
-import Vue from 'vue'
-import { getRequestToken } from '@nextcloud/auth'
-import App from './App'
-import store from './store'
 
-// eslint-disable-next-line camelcase
+import Vue from 'vue'
+import { generateFilePath } from '@nextcloud/router'
+import { getRequestToken } from '@nextcloud/auth'
+import { translate, translatePlural } from '@nextcloud/l10n'
+import Dashboard from './views/Dashboard'
+
+// eslint-disable-next-line
 __webpack_nonce__ = btoa(getRequestToken())
 
-// Correct the root of the app for chunk loading
-// OC.linkTo matches the apps folders
-// OC.generateUrl ensure the index.php (or not)
 // eslint-disable-next-line
-__webpack_public_path__ = OC.linkTo('user_status', 'js/')
+__webpack_public_path__ = generateFilePath('user_status', '', 'js/')
 
-Vue.prototype.t = t
-Vue.prototype.$t = t
-
-const app = new Vue({
-	render: h => h(App),
-	store,
-}).$mount('li[data-id="user_status-menuitem"]')
+Vue.prototype.t = translate
+Vue.prototype.n = translatePlural
+Vue.prototype.OC = OC
+Vue.prototype.OCA = OCA
 
 document.addEventListener('DOMContentLoaded', function() {
-	if (!OCA.Dashboard) {
-		return
-	}
-
-	OCA.Dashboard.registerStatus('status', (el) => {
-		const Dashboard = Vue.extend(App)
-		return new Dashboard({
-			propsData: {
-				inline: true,
-			},
-			store,
+	OCA.Dashboard.register('user_status', (el) => {
+		const View = Vue.extend(Dashboard)
+		new View({
+			propsData: {},
 		}).$mount(el)
 	})
-})
 
-export { app }
+})
