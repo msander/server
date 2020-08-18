@@ -80,7 +80,7 @@ class UserStatusWidget implements IWidget {
 	 * @inheritDoc
 	 */
 	public function getTitle(): string {
-		return $this->l10n->t('Recent status changes');
+		return $this->l10n->t('Recent statuses');
 	}
 
 	/**
