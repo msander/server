@@ -31,6 +31,7 @@ use OCP\Dashboard\IWidget;
 use OCP\IInitialStateService;
 use OCP\IL10N;
 use OCP\IUserManager;
+use OCP\IUserSession;
 
 /**
  * Class UserStatusWidget
@@ -48,6 +49,9 @@ class UserStatusWidget implements IWidget {
 	/** @var IUserManager */
 	private $userManager;
 
+	/** @var IUserSession */
+	private $userSession;
+
 	/** @var StatusService */
 	private $service;
 
@@ -57,15 +61,18 @@ class UserStatusWidget implements IWidget {
 	 * @param IL10N $l10n
 	 * @param IInitialStateService $initialStateService
 	 * @param IUserManager $userManager
+	 * @param IUserSession $userSession
 	 * @param StatusService $service
 	 */
 	public function __construct(IL10N $l10n,
 								IInitialStateService $initialStateService,
 								IUserManager $userManager,
+								IUserSession $userSession,
 								StatusService $service) {
 		$this->l10n = $l10n;
 		$this->initialStateService = $initialStateService;
 		$this->userManager = $userManager;
+		$this->userSession = $userSession;
 		$this->service = $service;
 	}
 
@@ -110,8 +117,26 @@ class UserStatusWidget implements IWidget {
 	public function load(): void {
 		\OCP\Util::addScript(Application::APP_ID, 'dashboard');
 
-		$recentStatusUpdates = $this->service->findAllRecentStatusChanges(7, 0);
-		$this->initialStateService->provideInitialState(Application::APP_ID, 'dashboard_data', array_map(function(UserStatus $status): array {
+		$currentUser = $this->userSession->getUser();
+		if ($currentUser === null) {
+			$this->initialStateService->provideInitialState(Application::APP_ID, 'dashboard_data', []);
+			return;
+		}
+		$currentUserId = $currentUser->getUID();
+
+		// Fetch status updates and filter current user
+		$recentStatusUpdates = array_slice(
+			array_filter(
+				$this->service->findAllRecentStatusChanges(8, 0),
+				static function (UserStatus $status) use ($currentUserId): bool {
+					return $status->getUserId() !== $currentUserId;
+				}
+			),
+			0,
+			7
+		);
+
+		$this->initialStateService->provideInitialState(Application::APP_ID, 'dashboard_data', array_map(function (UserStatus $status): array {
 			$user = $this->userManager->get($status->getUserId());
 			$displayName = $status->getUserId();
 			if ($user !== null) {
