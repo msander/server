@@ -22,13 +22,8 @@
 <template>
 	<DashboardWidget
 		id="user-status_panel"
-		:items="statuses"
+		:items="items"
 		:loading="loading">
-		<template v-slot:default="{ item }">
-			<DashboardWidgetItem :item="getWidgetItem(item)">
-				{{ item }}
-			</DashboardWidgetItem>
-		</template>
 		<template v-slot:empty-content>
 			<EmptyContent icon="icon-user-status">
 				{{ t('user_status', 'No one recently updated their status.') }}
@@ -38,7 +33,7 @@
 </template>
 
 <script>
-import { DashboardWidget, DashboardWidgetItem } from '@nextcloud/vue-dashboard'
+import { DashboardWidget } from '@nextcloud/vue-dashboard'
 import EmptyContent from '@nextcloud/vue/dist/Components/EmptyContent'
 import { loadState } from '@nextcloud/initial-state'
 import moment from '@nextcloud/moment'
@@ -47,7 +42,6 @@ export default {
 	name: 'Dashboard',
 	components: {
 		DashboardWidget,
-		DashboardWidgetItem,
 		EmptyContent,
 	},
 	data() {
@@ -57,8 +51,8 @@ export default {
 		}
 	},
 	computed: {
-		getWidgetItem() {
-			return (item) => {
+		items() {
+			return this.statuses.map((item) => {
 				const icon = item.icon || ''
 				const message = item.message || ''
 				const status = `${icon} ${message}`
@@ -67,7 +61,7 @@ export default {
 				if (item.timestamp !== null) {
 					subText = this.t('user_status', '{status}, {timestamp}', {
 						status,
-						timestamp: moment(item.timestamp, 'X').fromNow()
+						timestamp: moment(item.timestamp, 'X').fromNow(),
 					})
 				} else {
 					subText = status
@@ -78,7 +72,7 @@ export default {
 					subText,
 					avatarUsername: item.userId,
 				}
-			}
+			})
 		},
 	},
 	mounted() {
