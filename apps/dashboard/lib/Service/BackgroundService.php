@@ -26,16 +26,12 @@ declare(strict_types=1);
 
 namespace OCA\Dashboard\Service;
 
-
-use OCP\Files\File;
 use OCP\Files\IAppData;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
-use OCP\Files\SimpleFS\ISimpleFile;
 use OCP\IConfig;
 
 class BackgroundService {
-
 	public const THEMING_MODE_DARK = 'dark';
 
 	public const SHIPPED_BACKGROUNDS = [
@@ -130,5 +126,4 @@ class BackgroundService {
 		}
 		return null;
 	}
-
 }

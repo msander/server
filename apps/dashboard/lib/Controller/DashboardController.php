@@ -39,7 +39,6 @@ use OCP\Dashboard\IManager;
 use OCP\Dashboard\IWidget;
 use OCP\Dashboard\RegisterWidgetEvent;
 use OCP\EventDispatcher\IEventDispatcher;
-use OCP\Files\NotFoundException;
 use OCP\IConfig;
 use OCP\IInitialStateService;
 use OCP\IRequest;
